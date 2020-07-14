@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">GeolumenLocalizer</string>
+    <string name="title_activity_intro">IntroActivity</string>
+    /* Intro Activity */
+    <string name="inizia">Iniziamo</string>
+    <string name="seguente">Avanti</string>
+    <string name="precedente">Indietro</string>
+    <string name="skip">Skip</string>
+    <string name="titolo_slide1">Registrazione veloce</string>
+    <string name="titolo_slide2">Configurazione intuitiva</string>
+    <string name="titolo_slide3">Gestione completa</string>
+    <string name="descrizione_slide1">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</string>
+    <string name="descrizione_slide2">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</string>
+    <string name="descrizione_slide3">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</string>
+    <string name="titolo_intro">Titolo</string>
+    <string name="descrizione_intro">Descrizione</string>
+
+    /* Gestione permessi */
+    <string name="messaggio_permessi">Devi abilitare tutti i permessi per poter utilizzare l\'applicazione</string>
+    <string name="attenzione">Attenzione</string>
+    <string name="riprova">Riprova</string>
+    <string name="annulla">Annulla</string>
+</resources>

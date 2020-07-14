@@ -1,33 +1,34 @@
 package com.neutro.geolumenlocalizer;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.viewpager.widget.ViewPager;
-
 import com.google.android.material.tabs.TabLayout;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import adapter.IntroViewPagerAdapter;
 import shared.ElementoIntro;
+import util.GestionePermessi;
 import util.MySharedPreferences;
 
-public class IntroActivity extends AppCompatActivity implements View.OnClickListener{
-
+public class IntroActivity extends AppCompatActivity implements View.OnClickListener
+{
     private final static String INTROVALUE = "isIntroOpened";
-    private MySharedPreferences mySharedPreferences;
+    private static final int PERMISSION_GRANTED = PackageManager.PERMISSION_GRANTED;
+    private static final int PERMISSION_REQUEST_CODE=4;
     private ViewPager viewPager;
-    private IntroViewPagerAdapter introViewPagerAdapter;
     private TabLayout tabLayout;
     private List<ElementoIntro> listaElementi;
     private CardView btn_inizia;
@@ -35,7 +36,8 @@ public class IntroActivity extends AppCompatActivity implements View.OnClickList
     private CardView btn_previous;
     private CardView btn_skip;
     private Animation btn_inizia_anim;
-    private int posizione;
+    private GestionePermessi gp;
+    private MySharedPreferences mySharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -54,6 +56,7 @@ public class IntroActivity extends AppCompatActivity implements View.OnClickList
             startActivity(intent);
             finish();
         }
+        gp = new GestionePermessi(this);
         viewPager = findViewById(R.id.viewpager_intro);
         tabLayout = findViewById(R.id.tab_intro);
         btn_inizia = findViewById(R.id.btn_iniziamo);
@@ -70,11 +73,11 @@ public class IntroActivity extends AppCompatActivity implements View.OnClickList
         //Crea la lista intro
         creaListaIntro();
         //Configura il page adpter
-        introViewPagerAdapter = new IntroViewPagerAdapter(this, listaElementi);
+        IntroViewPagerAdapter introViewPagerAdapter = new IntroViewPagerAdapter(this, listaElementi);
         viewPager.setAdapter(introViewPagerAdapter);
         //Configura il tablayout
         tabLayout.setupWithViewPager(viewPager);
-        tabLayout.addOnTabSelectedListener(new TabLayout.BaseOnTabSelectedListener()
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener()
         {
             @Override
             public void onTabSelected(TabLayout.Tab tab)
@@ -112,6 +115,7 @@ public class IntroActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View view)
     {
         Intent intent;
+        int posizione;
         switch (view.getId())
         {
             case R.id.btn_next:
@@ -121,30 +125,28 @@ public class IntroActivity extends AppCompatActivity implements View.OnClickList
                     posizione++;
                     viewPager.setCurrentItem(posizione);
                 }
-                if(posizione==listaElementi.size()-1)
+                if(posizione ==listaElementi.size()-1)
                 {
                     caricaUltimaSchermata();
                 }
                 break;
             case R.id.btn_previous:
                 posizione = viewPager.getCurrentItem();
-                if(posizione>0)
+                if(posizione >0)
                 {
                     posizione--;
                     viewPager.setCurrentItem(posizione);
                 }
                 break;
-            case R.id.btn_iniziamo:
-                intent = new Intent(IntroActivity.this, LoginActivity.class);
-                startActivity(intent);
-                mySharedPreferences.salvaDatoBoolean(INTROVALUE,true);
-                finish();
-                break;
-            case R.id.btn_skip:
-                intent = new Intent(IntroActivity.this, LoginActivity.class);
-                startActivity(intent);
-                mySharedPreferences.salvaDatoBoolean(INTROVALUE,true);
-                finish();
+            default:
+                if(gp.checkPermession())
+                {
+                    //TODO : vai al login
+                    intent = new Intent(IntroActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    mySharedPreferences.salvaDatoBoolean(INTROVALUE,true);
+                    finish();
+                }
                 break;
         }
     }
@@ -156,9 +158,11 @@ public class IntroActivity extends AppCompatActivity implements View.OnClickList
         listaElementi.add(new ElementoIntro(R.string.titolo_slide1,R.string.descrizione_slide1,R.drawable.img_test));
         listaElementi.add(new ElementoIntro(R.string.titolo_slide2,R.string.descrizione_slide2,R.drawable.img_test));
         listaElementi.add(new ElementoIntro(R.string.titolo_slide3,R.string.descrizione_slide3,R.drawable.img_test));
+        listaElementi.add(new ElementoIntro(R.string.titolo_slide2,R.string.descrizione_slide2,R.drawable.img_test));
     }
 
     //Mostra il bottone inizia e nasconde il resto
+    @SuppressLint("ClickableViewAccessibility")
     private void caricaUltimaSchermata()
     {
         btn_inizia.setVisibility(View.VISIBLE);
@@ -175,5 +179,36 @@ public class IntroActivity extends AppCompatActivity implements View.OnClickList
                 return true;
             }
         });
+
+    }
+
+    //Controlla il risultato dei permessi
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        int count=0;
+        if (requestCode == PERMISSION_REQUEST_CODE)
+        {
+            for (int grantResult : grantResults)
+            {
+                if (grantResult == PERMISSION_GRANTED)
+                {
+                    count++;
+                }
+            }
+            if(count!=5)
+            {
+                gp.buildPermissionMessage();
+            }
+            else
+            {
+                //TODO : vai al login
+                Intent intent = new Intent(IntroActivity.this, LoginActivity.class);
+                startActivity(intent);
+                mySharedPreferences.salvaDatoBoolean(INTROVALUE,true);
+                finish();
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }
